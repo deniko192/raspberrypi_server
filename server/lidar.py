@@ -8,11 +8,12 @@ class Lidar:
     stopLidar = False
     max_distance = 0
     scan_data = [0]*360
+    lidar = RPLidar(None, 'COM5')
+    lidar.stop_motor()
+    thrStarted = False
 
     def __init__(self):
         self.lidarThr = threading.Thread(target=self.startLidarFn)
-        self.lidar = RPLidar(None, 'COM5', timeout=3)
-
 
     def startLidarFn(self):
         for scan in self.lidar.iter_scans():
@@ -23,21 +24,19 @@ class Lidar:
     def _stopLidarFn(self):
         self.lidar.stop()
         self.lidar.stop_motor()
-        self.lidar.disconnect()
 
     def startLidarThread(self):
-        self.lidarThr.start()
+        self.lidar.start_motor()
+        time.sleep(3)
+        if (self.thrStarted == False):
+            self.lidarThr.start()
+            self.thrStarted = True
 
     def stopLidarThread(self):
         self.stopLidar = True
         time.sleep(2)
         self._stopLidarFn()
 
-    def getLidarData(self):
-        print(self.scan_data)
+    def getData(self):
+        return self.scan_data
     
-lidar = Lidar()
-lidar.startLidarThread()
-time.sleep(2)
-lidar.getLidarData()
-lidar.stopLidarThread()

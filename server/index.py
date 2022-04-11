@@ -1,24 +1,35 @@
 from flask import Flask
+import flask
+from flask_cors import CORS
 
 from lidar import Lidar
 
 app = Flask(__name__)
 
 lidar = Lidar()
+app.config['CORS_HEADERS'] = 'Content-Type'
+
+cors = CORS(app, resources={r"/": {"origins": "http://localhost:3000/"}})
 
 @app.route('/start_lidar')
 def startLidar():
     lidar.startLidarThread()
-    return ''
+    response = flask.jsonify({'data': ''})
+    response.headers.add('Access-Control-Allow-Origin', '*')
+    return response
 
 @app.route('/stop_lidar')
 def stopLidar():
     lidar.stopLidarThread()
-    return ''
+    response = flask.jsonify({'data': ''})
+    response.headers.add('Access-Control-Allow-Origin', '*')
+    return response
 
 @app.route('/get_lidar_data')
 def getLidarData():
-    return ', '.join(str(e) for e in lidar.getData())
+    response = flask.jsonify({'data': lidar.getData()})
+    response.headers.add('Access-Control-Allow-Origin', '*')
+    return response
 
 app.run(host='127.0.0.1', port='3001')
 

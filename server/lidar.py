@@ -4,10 +4,12 @@ from adafruit_rplidar import RPLidar
 import threading
 import time
 
+from matplotlib.pyplot import sca
+
 class Lidar:
     stopLidar = False
     max_distance = 0
-    scan_data = [0]*360
+    scan_data = []
     lidar = RPLidar(None, 'COM5')
     lidar.stop_motor()
     thrStarted = False
@@ -17,8 +19,7 @@ class Lidar:
 
     def startLidarFn(self):
         for scan in self.lidar.iter_scans():
-            for (_, angle, distance) in scan:
-                self.scan_data[min([359, floor(angle)])] = distance
+            self.scan_data = scan
             if self.stopLidar: return
 
     def _stopLidarFn(self):
